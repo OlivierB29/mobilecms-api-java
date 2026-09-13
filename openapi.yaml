@@ -1,0 +1,672 @@
+openapi: 3.1.0
+info:
+  title: MobileCMS API
+  description: REST API for JSON-file content, authentication, media, and administration.
+  version: v50
+  license:
+    name: MIT
+servers:
+  - url: https://example.invalid/mobilecmsapi/v50
+    description: Replace with the deployment URL
+  - url: http://localhost/mobilecmsapi/v50
+    description: Local development
+
+tags:
+  - name: Auth
+  - name: CMS
+  - name: Web
+  - name: Files
+  - name: Admin
+  - name: Misc
+
+paths:
+  /agenda/events.ics:
+    get:
+      tags: [CMS]
+      summary: Export calendar events as iCalendar
+      security: []
+      responses:
+        '200':
+          description: iCalendar document
+          content:
+            text/calendar:
+              schema: { type: string }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /cmsapi/status:
+    get:
+      tags: [CMS]
+      summary: Get API status
+      security: []
+      responses:
+        '200':
+          description: Status object; currently empty in the reference implementation
+          content:
+            application/json:
+              schema: { type: object, additionalProperties: true }
+
+  /authapi/publicinfo:
+    get:
+      tags: [Auth]
+      summary: Get public account information
+      security: []
+      responses:
+        '200':
+          description: Public account information
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PublicUser' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+    post:
+      tags: [Auth]
+      summary: Submit public account information
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /authapi/authenticate:
+    post:
+      tags: [Auth]
+      summary: Authenticate a user and issue a JWT
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+            example: { user: editor@example.com, password: Sample#123456 }
+      responses:
+        '200':
+          description: Authenticated user and bearer token
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthenticationResult' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '429': { $ref: '#/components/responses/TooManyRequests' }
+
+  /authapi/changepassword:
+    post:
+      tags: [Auth]
+      summary: Change a user's password
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PasswordChangeRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /authapi/resetpassword:
+    post:
+      tags: [Auth]
+      summary: Reset a user's password
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/PasswordChangeRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /debugapi:
+    get:
+      tags: [Misc]
+      summary: Get diagnostic information
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cmsapi/content:
+    get:
+      tags: [CMS]
+      summary: List available content types
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: Content types and localized labels
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/ContentType' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cmsapi/content/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [CMS]
+      summary: List records of a content type
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/timestamp' }]
+      responses:
+        '200':
+          description: Content index or record list
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/ContentRecord' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [CMS]
+      summary: Create or update a content record
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContentRecord' }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cmsapi/content/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    get:
+      tags: [CMS]
+      summary: Get a content record
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/timestamp' }]
+      responses:
+        '200':
+          description: Content record
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ContentRecord' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [CMS]
+      summary: Delete a content record and its media
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/EmptyObject' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /cmsapi/deletelist/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    post:
+      tags: [CMS]
+      summary: Delete multiple content records
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: array, items: { type: string } }
+      responses:
+        '200': { $ref: '#/components/responses/EmptyObject' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cmsapi/index/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [CMS]
+      summary: Get a content index
+      security: [{ bearerAuth: [] }]
+      parameters: [{ $ref: '#/components/parameters/timestamp' }]
+      responses:
+        '200':
+          description: Index entries
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/IndexEntry' } }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [CMS]
+      summary: Rebuild a content index
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /cmsapi/metadata/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [CMS]
+      summary: Get content metadata
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /cmsapi/template/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [CMS]
+      summary: Get the new-record template
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /webapi/content/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [Web]
+      summary: Publicly read published records
+      security: []
+      parameters: [{ $ref: '#/components/parameters/timestamp' }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /webapi/content/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    get:
+      tags: [Web]
+      summary: Publicly read one published record
+      security: []
+      parameters: [{ $ref: '#/components/parameters/timestamp' }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /fileapi/basicupload/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    get:
+      tags: [Files]
+      summary: List files attached to a record
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200':
+          description: File metadata
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MediaFile' } }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+    post:
+      tags: [Files]
+      summary: Upload one or more files
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [uploadfiles]
+              properties:
+                uploadfiles:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        '200':
+          description: Uploaded file metadata
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: '#/components/schemas/MediaFile' } }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '413': { $ref: '#/components/responses/PayloadTooLarge' }
+        '415': { $ref: '#/components/responses/UnsupportedMediaType' }
+
+  /fileapi/delete/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    post:
+      tags: [Files]
+      summary: Delete attached files
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: array, items: { $ref: '#/components/schemas/MediaFileReference' } }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+
+  /fileapi/thumbnails/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    post:
+      tags: [Files]
+      summary: Generate thumbnails for a record's media
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        content:
+          application/json:
+            schema: { type: array, items: { $ref: '#/components/schemas/MediaFileReference' } }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /adminapi/content:
+    get:
+      tags: [Admin]
+      summary: List administrable content types
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /adminapi/content/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [Admin]
+      summary: List records for administration
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Admin]
+      summary: Create an administrative record
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ContentRecord' }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /adminapi/content/{type}/{id}:
+    parameters:
+      - { $ref: '#/components/parameters/type' }
+      - { $ref: '#/components/parameters/id' }
+    get:
+      tags: [Admin]
+      summary: Get a record for administration
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    post:
+      tags: [Admin]
+      summary: Reset a record
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    delete:
+      tags: [Admin]
+      summary: Delete an administrative record
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/EmptyObject' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /adminapi/metadata/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [Admin]
+      summary: Get administrative metadata
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /adminapi/theme:
+    get:
+      tags: [Admin]
+      summary: Get the site theme
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Admin]
+      summary: Replace the site theme
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, additionalProperties: true }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /adminapi/theme/banner:
+    post:
+      tags: [Admin]
+      summary: Upload a theme banner
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [uploadfiles]
+              properties:
+                uploadfiles:
+                  type: array
+                  items: { type: string, format: binary }
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /adminapi/index/{type}:
+    parameters: [{ $ref: '#/components/parameters/type' }]
+    get:
+      tags: [Admin]
+      summary: Get an administrative index
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Admin]
+      summary: Rebuild an administrative index
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { $ref: '#/components/responses/AnyJson' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Use the token returned by `/authapi/authenticate`.
+  parameters:
+    type:
+      name: type
+      in: path
+      required: true
+      schema: { type: string, pattern: '^[A-Za-z0-9_-]+$' }
+      example: calendar
+    id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, minLength: 1 }
+      example: '1'
+    timestamp:
+      name: timestamp
+      in: query
+      required: false
+      description: Optional cache-busting timestamp accepted by read endpoints.
+      schema: { type: integer, format: int64 }
+  schemas:
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+        message: { type: string }
+      additionalProperties: true
+    ContentType:
+      type: object
+      required: [type, labels]
+      properties:
+        type: { type: string, example: calendar }
+        labels:
+          type: array
+          items:
+            type: object
+            required: [i18n, label]
+            properties:
+              i18n: { type: string, example: fr }
+              label: { type: string, example: Calendrier }
+    ContentRecord:
+      type: object
+      description: Extensible record. Calendar fixtures use the fields shown below; other content types may add fields.
+      required: [id, type]
+      properties:
+        id: { type: string, example: Stage-Iaido }
+        type: { type: string, example: calendar }
+        status: { type: string, example: published }
+        title: { type: string, example: Stage Iaido - Lorient }
+        date: { type: string, format: date, example: '2026-10-17' }
+        enddate: { type: string, format: date, example: '2026-10-18' }
+        activity: { type: string, example: iaido }
+        organization: { type: string, example: PL Lorient }
+        description: { type: string, description: May contain HTML or BBCode depending on the client. }
+        location: { type: string, example: Lorient }
+        url: { type: [string, 'null'], format: uri }
+        media:
+          type: array
+          items: { $ref: '#/components/schemas/MediaFile' }
+        attachments:
+          type: array
+          items: { $ref: '#/components/schemas/MediaFile' }
+      additionalProperties: true
+    IndexEntry:
+      type: object
+      description: Projection of a record selected by the content type's index configuration.
+      properties:
+        id: { type: string }
+      additionalProperties: true
+    MediaFile:
+      type: object
+      required: [title, url, size, mimetype]
+      properties:
+        title: { type: string, example: lorem ipsum.pdf }
+        url: { type: string, example: lorem ipsum.pdf }
+        size: { type: integer, format: int64, minimum: 0, example: 24612 }
+        mimetype: { type: string, example: application/pdf }
+        width: { type: integer, minimum: 0 }
+        height: { type: integer, minimum: 0 }
+      additionalProperties: true
+    MediaFileReference:
+      type: object
+      required: [url]
+      properties:
+        url: { type: string, example: image.jpg }
+        title: { type: string, example: Image }
+      additionalProperties: true
+    LoginRequest:
+      type: object
+      required: [user, password]
+      properties:
+        user: { type: string, description: User email or configured username, example: editor@example.com }
+        password: { type: string, format: password, example: Sample#123456 }
+    PasswordChangeRequest:
+      type: object
+      required: [user, password, newpassword]
+      properties:
+        user: { type: string, example: editor@example.com }
+        password: { type: string, format: password }
+        newpassword: { type: string, format: password }
+    PublicUser:
+      type: object
+      properties:
+        name: { type: string }
+        username: { type: string }
+        email: { type: string, format: email }
+        role: { type: string, enum: [guest, editor, admin] }
+        clientalgorithm: { type: string }
+        newpasswordrequired: { type: string }
+      additionalProperties: true
+    AuthenticationResult:
+      allOf:
+        - $ref: '#/components/schemas/PublicUser'
+        - type: object
+          required: [token]
+          properties:
+            token: { type: string }
+    AnyJson:
+      description: Endpoint-specific JSON result.
+      oneOf:
+        - type: object
+          additionalProperties: true
+        - type: array
+          items: {}
+        - type: string
+        - type: number
+        - type: boolean
+        - type: 'null'
+
+  responses:
+    AnyJson:
+      description: JSON result
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/AnyJson' }
+    EmptyObject:
+      description: Successful operation with no result
+      content:
+        application/json:
+          schema: { type: object, example: {} }
+    BadRequest:
+      description: Malformed request or invalid argument
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Unauthorized:
+      description: Missing or invalid JWT, or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    Forbidden:
+      description: Authenticated user lacks the required role
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    NotFound:
+      description: Requested resource was not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    TooManyRequests:
+      description: Login throttled
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    PayloadTooLarge:
+      description: Uploaded file exceeds configured limits
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    UnsupportedMediaType:
+      description: File extension or MIME type is not configured
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/Error' }
