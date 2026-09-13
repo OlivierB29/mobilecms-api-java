@@ -1,0 +1,21 @@
+{
+  "publicdir": "public",
+  "privatedir": "../private",
+  "media": "media",
+  "imagedriver": "gd",
+  "jwt": "php-jwt",
+  "postformdata": "phpinput",
+  "thumbnailsizes": [300, 768, 1024],
+  "fileextensions": ["jpg", "jpeg", "png", "gif", "pdf", "docx", "xlsx", "pptx", "odt", "ods", "odp", "mp4", "m4v"],
+  "mimetypes": ["image/jpeg", "image/png", "image/gif", "application/pdf"],
+  "imagequality": 70,
+  "enablecleaninputs": "true",
+  "https": "true",
+  "enablemail": "false",
+  "debugnotifications": "false",
+  "mailsender": "no-reply@example.org",
+  "eventcalname": "@mydomain",
+  "eventprodid": "-//mydomain//NONSGML v1.0//EN",
+  "eventxwrcalname": "Calendrier",
+  "eventsiteprefix": "https://example.org/#/calendrier/detail/"
+}

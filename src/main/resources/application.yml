@@ -1,0 +1,20 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+  jackson:
+    serialization:
+      indent-output: false
+      write-dates-as-timestamps: false
+
+mobilecms:
+  root-dir: ${MOBILECMS_ROOT:.}
+  conf-file: ${MOBILECMS_CONF:conf/development/conf.json}
+  api-root: /mobilecmsapi
+  api-version: /v50
