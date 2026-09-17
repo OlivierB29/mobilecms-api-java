@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8888
   servlet:
     context-path: /
 
@@ -14,7 +14,7 @@ spring:
       write-dates-as-timestamps: false
 
 mobilecms:
-  root-dir: ${MOBILECMS_ROOT:.}
-  conf-file: ${MOBILECMS_CONF:conf/development/conf.json}
+  root-dir: ${MOBILECMS_ROOT:webhost}
+  conf-file: ${MOBILECMS_CONF:webhost/private/conf/conf.json}
   api-root: /mobilecmsapi
   api-version: /v50

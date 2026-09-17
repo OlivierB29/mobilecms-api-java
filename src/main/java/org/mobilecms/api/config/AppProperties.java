@@ -31,8 +31,8 @@ public class AppProperties {
 
     public AppProperties(
             ObjectMapper mapper,
-            @Value("${mobilecms.root-dir:.}") String configuredRoot,
-            @Value("${mobilecms.conf-file:conf/development/conf.json}") String confFile) {
+            @Value("${mobilecms.root-dir:webhost}") String configuredRoot,
+            @Value("${mobilecms.conf-file:webhost/private/conf/conf.json}") String confFile) {
         this.mapper = mapper;
         this.configuredRoot = configuredRoot;
         this.confFile = confFile;
@@ -41,10 +41,10 @@ public class AppProperties {
     @PostConstruct
     public void load() {
         rootDir = Path.of(configuredRoot).toAbsolutePath().normalize();
-        Path file = Path.of(confFile);
-        if (!file.isAbsolute()) {
+        Path file = Path.of(confFile).toAbsolutePath().normalize();
+      /*   if (!file.isAbsolute()) {
             file = rootDir.resolve(confFile);
-        }
+        }*/
         if (!Files.exists(file)) {
             throw new IllegalStateException("conf file not found " + file);
         }
