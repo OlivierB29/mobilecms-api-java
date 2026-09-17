@@ -1,0 +1,11 @@
+[
+  {"type":"calendar", "labels": [ {"i18n":"en", "label":"Calendar"}, {"i18n":"fr", "label":"Calendrier"}]},
+  {"type":"news", "labels": [ {"i18n":"en", "label":"News"}, {"i18n":"fr", "label":"Actualités"}]},
+  {"type":"documents", "labels": [ {"i18n":"en", "label":"Documents"}, {"i18n":"fr", "label":"Documents"}]},
+  {"type":"clubs", "labels": [ {"i18n":"en", "label":"Clubs"}, {"i18n":"fr", "label":"Clubs"}]},
+  {"type":"contacts", "labels": [ {"i18n":"en", "label":"Contacts"}, {"i18n":"fr", "label":"Contacts"}]},
+  {"type":"links", "labels": [ {"i18n":"en", "label":"Links"}, {"i18n":"fr", "label":"Liens"}]},
+  {"type":"structure", "labels": [ {"i18n":"en", "label":"Structure"}, {"i18n":"fr", "label":"Organisation"}]},
+  {"type":"reports", "labels": [ {"i18n":"en", "label":"Reports"}, {"i18n":"fr", "label":"Comptes Rendus"}]},
+  {"type":"theme", "labels": [ {"i18n":"en", "label":"Theme"}, {"i18n":"fr", "label":"Apparence"}]}
+]

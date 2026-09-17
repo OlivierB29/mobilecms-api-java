@@ -131,6 +131,11 @@ public class CmsController {
         return ResponseEntity.ok(jsonFiles.read(contentService.getTemplateFileName(properties.getPublicDir(), type)));
     }
 
+    @GetMapping("/webapi/content")
+    public ResponseEntity<Object> publicTypes() {
+        return ResponseEntity.ok(contentService.options(properties.getPublicDir(), "types.json"));
+    }
+
     @GetMapping("/webapi/content/{type}")
     public ResponseEntity<Object> webList(@PathVariable String type, @RequestParam(required = false) Long timestamp) {
         return AuthController.toResponse(contentService.getAllObjectsFromIndexByType(properties.getPublicDir(), type));
