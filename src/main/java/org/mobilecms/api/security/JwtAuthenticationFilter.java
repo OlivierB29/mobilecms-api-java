@@ -30,6 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             ApiConstants.API + "/webapi",
             ApiConstants.API + "/agenda",
             ApiConstants.API + "/cmsapi/status",
+            "/media",
             "/v3/api-docs",
             "/swagger-ui",
             "/swagger-ui.html",

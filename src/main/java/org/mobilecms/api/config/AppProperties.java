@@ -126,7 +126,15 @@ public class AppProperties {
     }
 
     public Path getMediaDir() {
-        return concat(rootDir, getString("media"));
+        Path configuredMediaDir = concat(rootDir, getString("media"));
+        if (Files.isDirectory(configuredMediaDir)) {
+            return configuredMediaDir;
+        }
+        Path webMediaDir = rootDir.resolve("www").resolve("media");
+        if (Files.isDirectory(webMediaDir)) {
+            return webMediaDir;
+        }
+        return configuredMediaDir;
     }
 
     public Path getUsersDir() {

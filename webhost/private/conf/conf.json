@@ -4,7 +4,7 @@
   "postformdata": "phpinput",
   "publicdir": "www/public",
   "privatedir": "private",
-  "media": "media",
+  "media": "www/media",
   "thumbnailsizes":[150, 300, 672, 768, 1024],
   "fileextensions":["jpg","jpeg","png","gif","pdf","docx","xlsx","pptx","odt","ods","odp","mp4","m4v"],
   "mimetypes":["image/jpeg","image/png","image/gif","application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/vnd.oasis.opendocument.text","application/vnd.oasis.opendocument.spreadsheet","application/vnd.oasis.opendocument.presentation","video/mp4","video/m4v"],
