@@ -1,19 +1,22 @@
-package org.mobilecms.api.web;
+package org.mobilecms.api.impl.admin;
 
-import org.mobilecms.api.ApiConstants;
+import java.util.List;
+
 import org.mobilecms.api.config.AppProperties;
+import org.mobilecms.api.error.ApiException;
 import org.mobilecms.api.service.AuthService;
 import org.mobilecms.api.service.ContentService;
 import org.mobilecms.api.service.FileService;
+import org.mobilecms.api.service.ServiceResult;
 import org.mobilecms.api.service.UserService;
 import org.mobilecms.api.util.JsonFiles;
+import org.mobilecms.generated.admin.api.AdminApi;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -22,8 +25,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
-@RequestMapping(ApiConstants.API + "/adminapi")
-public class AdminController {
+public class AdminController implements AdminApi {
 
     private final ContentService contentService;
     private final AuthService authService;
@@ -47,18 +49,22 @@ public class AdminController {
         this.jsonFiles = jsonFiles;
     }
 
-    @GetMapping("/content")
-    public ResponseEntity<Object> types() {
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/content")
+    public ResponseEntity<Object> types1() {
         return ResponseEntity.ok(contentService.options(properties.getPrivateDir(), "types.json"));
     }
 
-    @GetMapping("/content/{type}")
-    public ResponseEntity<Object> list(@PathVariable String type) {
-        return AuthController.toResponse(userService.getAllUsers());
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/content/{type}")
+    public ResponseEntity<Object> list2(@PathVariable String type) {
+        return toResponse(userService.getAllUsers());
     }
 
-    @PostMapping("/content/{type}")
-    public ResponseEntity<Object> create(@PathVariable String type, @RequestBody ObjectNode requestUser) {
+    @Override
+    @PostMapping("/mobilecmsapi/v50/adminapi/content/{type}")
+    public ResponseEntity<Object> create(@PathVariable String type, @RequestBody Object body) {
+        ObjectNode requestUser = asObjectNode(body, "create");
         ObjectNode user = jsonFiles.object();
         user.put("name", "");
         user.put("email", "");
@@ -73,53 +79,73 @@ public class AdminController {
             contentService.publishById(properties.getPrivateDir(), type, "email", user.get("email").asText());
             return ResponseEntity.ok(jsonFiles.object());
         }
-        return AuthController.toResponse(org.mobilecms.api.service.ServiceResult.error(400, createResult));
+        return toResponse(ServiceResult.error(400, createResult));
     }
 
-    @GetMapping("/content/{type}/{id}")
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/content/{type}/{id}")
     public ResponseEntity<Object> get(@PathVariable String type, @PathVariable String id) {
         var tmp = contentService.getRecord(properties.getPrivateDir(), type, id);
         if (tmp.isOk() && tmp.getResult() instanceof ObjectNode user) {
             return ResponseEntity.ok(authService.publicAdminUser(user));
         }
-        return AuthController.toResponse(tmp);
+        return toResponse(tmp);
     }
 
-    @PostMapping("/content/{type}/{id}")
-    public ResponseEntity<Object> reset(@PathVariable String type, @PathVariable String id, @RequestBody ObjectNode user) {
+    @Override
+    @PostMapping("/mobilecmsapi/v50/adminapi/content/{type}/{id}")
+    public ResponseEntity<Object> reset(@PathVariable String type, @PathVariable String id, @RequestBody Object body) {
+        ObjectNode user = asObjectNode(body, "reset");
         if (user.has("newpassword")) {
-            return AuthController.toResponse(authService.resetPassword(user.get("email").asText(), user.get("newpassword").asText()));
+            return toResponse(authService.resetPassword(user.get("email").asText(), user.get("newpassword").asText()));
         }
         var putResponse = contentService.update(properties.getPrivateDir(), type, "email", authService.publicAdminUser(user));
         if (putResponse.isOk() && putResponse.getResult() instanceof ObjectNode saved) {
-            return AuthController.toResponse(contentService.publishById(
+            return toResponse(contentService.publishById(
                     properties.getPrivateDir(), type, "email", saved.get("email").asText()));
         }
-        return AuthController.toResponse(putResponse);
+        return toResponse(putResponse);
     }
 
-    @DeleteMapping("/content/{type}/{id}")
-    public ResponseEntity<Object> delete(@PathVariable String type, @PathVariable String id) {
+    @Override
+    @PostMapping("/mobilecmsapi/v50/adminapi/index/{type}")
+    public ResponseEntity<Object> rebuild1(@PathVariable String type) {
+        return toResponse(contentService.rebuildIndex(properties.getPrivateDir(), type, "email"));
+    }
+
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/index/{type}")
+    public ResponseEntity<Object> index1(@PathVariable String type) {
+        return toResponse(contentService.getAll(properties.getPrivateDir(), type + "/index/index.json"));
+    }
+
+    @Override
+    @DeleteMapping("/mobilecmsapi/v50/adminapi/content/{type}/{id}")
+    public ResponseEntity<Object> delete1(@PathVariable String type, @PathVariable String id) {
         var response = contentService.deleteRecord(properties.getPrivateDir(), type, id);
         if (response.isOk()) {
             response = contentService.rebuildIndex(properties.getPrivateDir(), type, "email");
         }
-        return AuthController.toResponse(response);
+        return toResponse(response);
     }
 
-    @GetMapping("/metadata/{type}")
-    public ResponseEntity<Object> metadata(@PathVariable String type) {
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/metadata/{type}")
+    public ResponseEntity<Object> metadata1(@PathVariable String type) {
         return ResponseEntity.ok(jsonFiles.read(contentService.getMetadataFileName(properties.getPrivateDir(), type)));
     }
 
-    @GetMapping("/theme")
+    @Override
+    @GetMapping("/mobilecmsapi/v50/adminapi/theme")
     public ResponseEntity<Object> getTheme() {
         var themeFile = properties.getPublicDir().resolve("theme").resolve("theme.json");
         return ResponseEntity.ok(jsonFiles.read(themeFile));
     }
 
-    @PostMapping("/theme")
-    public ResponseEntity<Object> postTheme(@RequestBody JsonNode data) {
+    @Override
+    @PostMapping("/mobilecmsapi/v50/adminapi/theme")
+    public ResponseEntity<Object> postTheme(@RequestBody Object body) {
+        JsonNode data = asJsonNode(body);
         if (!data.isObject()) {
             throw new IllegalArgumentException("Theme must be a JSON object");
         }
@@ -128,24 +154,37 @@ public class AdminController {
         return ResponseEntity.ok(data);
     }
 
-    @PostMapping("/theme/banner")
+    @Override
+    @PostMapping("/mobilecmsapi/v50/adminapi/theme/banner")
     public ResponseEntity<Object> banner(
-            @RequestPart(value = "uploadfiles", required = false) MultipartFile[] uploadfiles,
+            @RequestPart(value = "uploadfiles", required = false) List<MultipartFile> uploadfiles,
             @RequestPart(value = "banner", required = false) MultipartFile banner) {
         MultipartFile file = banner;
-        if (file == null && uploadfiles != null && uploadfiles.length > 0) {
-            file = uploadfiles[0];
+        if (file == null && uploadfiles != null && !uploadfiles.isEmpty()) {
+            file = uploadfiles.get(0);
         }
         return ResponseEntity.ok(fileService.uploadBanner(file));
     }
 
-    @GetMapping("/index/{type}")
-    public ResponseEntity<Object> index(@PathVariable String type) {
-        return AuthController.toResponse(contentService.getAll(properties.getPrivateDir(), type + "/index/index.json"));
+    private JsonNode asJsonNode(Object body) {
+        if (body == null) {
+            return jsonFiles.mapper().createObjectNode();
+        }
+        if (body instanceof JsonNode jsonNode) {
+            return jsonNode;
+        }
+        return jsonFiles.mapper().valueToTree(body);
     }
 
-    @PostMapping("/index/{type}")
-    public ResponseEntity<Object> rebuild(@PathVariable String type) {
-        return AuthController.toResponse(contentService.rebuildIndex(properties.getPrivateDir(), type, "email"));
+    private ObjectNode asObjectNode(Object body, String action) {
+        JsonNode jsonNode = asJsonNode(body);
+        if (!(jsonNode instanceof ObjectNode objectNode)) {
+            throw ApiException.badRequest(action + " requires a JSON object");
+        }
+        return objectNode;
+    }
+
+    private static ResponseEntity<Object> toResponse(ServiceResult result) {
+        return ResponseEntity.status(result.getCode()).body(result.getResult());
     }
 }

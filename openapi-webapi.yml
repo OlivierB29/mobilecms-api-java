@@ -1,0 +1,78 @@
+openapi: 3.1.0
+info:
+  title: MobileCMS Web API
+  description: Public read-only content endpoints.
+  version: v50
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: Web
+    description: Public read-only content endpoints
+paths:
+  /mobilecmsapi/v50/webapi/content:
+    get:
+      tags:
+        - Web
+      operationId: publicTypes
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/webapi/content/{type}:
+    get:
+      tags:
+        - Web
+      operationId: webList
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/webapi/content/{type}/{id}:
+    get:
+      tags:
+        - Web
+      operationId: webGet
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas: {}

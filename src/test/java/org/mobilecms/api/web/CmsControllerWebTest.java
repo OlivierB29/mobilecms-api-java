@@ -6,17 +6,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 import org.mobilecms.api.config.AppProperties;
+import org.mobilecms.api.impl.cms.CmsController;
 import org.mobilecms.api.security.JwtService;
 import org.mobilecms.api.service.AuthService;
 import org.mobilecms.api.service.CalendarExportService;
 import org.mobilecms.api.service.ContentService;
 import org.mobilecms.api.service.FileService;
-import org.mobilecms.api.service.ServiceResult;
 import org.mobilecms.api.util.JsonFiles;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;

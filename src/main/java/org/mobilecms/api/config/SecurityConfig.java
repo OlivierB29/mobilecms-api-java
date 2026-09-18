@@ -1,6 +1,11 @@
 package org.mobilecms.api.config;
 
 import org.mobilecms.api.security.JwtAuthenticationFilter;
+import org.mobilecms.api.security.JwtService;
+import org.mobilecms.api.service.AuthService;
+import org.mobilecms.api.service.ThrottleService;
+import org.mobilecms.api.service.UserService;
+import org.mobilecms.api.util.JsonFiles;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +22,14 @@ import java.util.List;
 
 @Configuration
 public class SecurityConfig {
+
+    @Bean
+    AuthService authService(UserService userService,
+                           ThrottleService throttleService,
+                           JwtService jwtService,
+                           JsonFiles jsonFiles) {
+        return new AuthService(userService, throttleService, jwtService, jsonFiles);
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {

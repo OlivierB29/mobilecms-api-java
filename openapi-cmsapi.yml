@@ -1,0 +1,266 @@
+openapi: 3.1.0
+info:
+  title: MobileCMS CMS API
+  description: Content management and editor endpoints.
+  version: v50
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: CMS
+    description: Content management endpoints
+paths:
+  /mobilecmsapi/v50/cmsapi/index/{type}:
+    get:
+      tags:
+        - CMS
+      operationId: index
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+        - CMS
+      operationId: rebuild
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/deletelist/{type}:
+    post:
+      tags:
+        - CMS
+      operationId: deleteList
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/content/{type}:
+    get:
+      tags:
+        - CMS
+      operationId: list_1
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+        - CMS
+      operationId: save
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/template/{type}:
+    get:
+      tags:
+        - CMS
+      operationId: template
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/status:
+    get:
+      tags:
+        - CMS
+      operationId: status
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/metadata/{type}:
+    get:
+      tags:
+        - CMS
+      operationId: metadata
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/content:
+    get:
+      tags:
+        - CMS
+      operationId: types
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/cmsapi/content/{type}/{id}:
+    get:
+      tags:
+        - CMS
+      operationId: get_1
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: timestamp
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    delete:
+      tags:
+        - CMS
+      operationId: delete_2
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    JsonNode: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

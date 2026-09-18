@@ -48,6 +48,11 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.2.6</version>
+        </dependency>
+        <dependency>
             <groupId>com.nimbusds</groupId>
             <artifactId>nimbus-jose-jwt</artifactId>
             <version>${nimbus.version}</version>
@@ -86,46 +91,147 @@
                 <version>7.9.0</version>
                 <executions>
                     <execution>
-                        <id>generate-java-interfaces</id>
+                        <id>generate-admin-api</id>
                         <phase>generate-sources</phase>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/openapi-adminapi.yml</inputSpec>
                             <generatorName>spring</generatorName>
-                            <output>${project.basedir}/src/generated</output>
+                            <output>${project.basedir}/src/generated/admin</output>
                             <sourceFolder>src/main/java</sourceFolder>
-                            <apiPackage>org.mobilecms.generated.api</apiPackage>
-                            <modelPackage>org.mobilecms.generated.model</modelPackage>
-                            <invokerPackage>org.mobilecms.generated</invokerPackage>
+                            <apiPackage>org.mobilecms.generated.admin.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.admin.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.admin</invokerPackage>
                             <configOptions>
                                 <interfaceOnly>true</interfaceOnly>
                                 <useJakartaEe>true</useJakartaEe>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <skipDefaultInterface>true</skipDefaultInterface>
                                 <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
                             </configOptions>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-antrun-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
                     <execution>
-                        <id>flatten-generated-java</id>
+                        <id>generate-auth-api</id>
                         <phase>generate-sources</phase>
                         <goals>
-                            <goal>run</goal>
+                            <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <target>
-                                <delete dir="${project.basedir}/src/generated/java"/>
-                                <move file="${project.basedir}/src/generated/src/main/java" tofile="${project.basedir}/src/generated/java"/>
-                            </target>
+                            <inputSpec>${project.basedir}/openapi-authapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated/auth</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.auth.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.auth.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.auth</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-cms-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi-cmsapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated/cms</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.cms.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.cms.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.cms</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-file-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi-fileapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated/file</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.file.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.file.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.file</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-web-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi-webapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated/web</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.web.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.web.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.web</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>generate-misc-api</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi-miscapi.yml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated/misc</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.misc.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.misc.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated.misc</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                                <useTags>true</useTags>
+                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>
@@ -143,26 +249,13 @@
                         </goals>
                         <configuration>
                             <sources>
-                                <source>${project.basedir}/src/generated/java</source>
+                                <source>${project.basedir}/src/generated/admin/src/main/java</source>
+                                <source>${project.basedir}/src/generated/auth/src/main/java</source>
+                                <source>${project.basedir}/src/generated/cms/src/main/java</source>
+                                <source>${project.basedir}/src/generated/file/src/main/java</source>
+                                <source>${project.basedir}/src/generated/web/src/main/java</source>
+                                <source>${project.basedir}/src/generated/misc/src/main/java</source>
                             </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.springdoc</groupId>
-                <artifactId>springdoc-openapi-maven-plugin</artifactId>
-                <version>1.5</version>
-                <executions>
-                    <execution>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>generate</goal>
-                        </goals>
-                        <configuration>
-                            <apiDocsUrl>http://localhost:8080/v3/api-docs.yaml</apiDocsUrl>
-                            <outputFileName>openapi.yaml</outputFileName>
-                            <outputDir>${project.basedir}</outputDir>
                         </configuration>
                     </execution>
                 </executions>

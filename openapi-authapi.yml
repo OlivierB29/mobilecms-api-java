@@ -1,0 +1,104 @@
+openapi: 3.1.0
+info:
+  title: MobileCMS Auth API
+  description: Authentication and account management endpoints.
+  version: v50
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: Auth
+    description: Authentication and account management endpoints
+paths:
+  /mobilecmsapi/v50/authapi/resetpassword:
+    post:
+      tags:
+        - Auth
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/authapi/publicinfo:
+    get:
+      tags:
+        - Auth
+      operationId: publicInfo
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+    post:
+      tags:
+        - Auth
+      operationId: publicInfoPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/authapi/changepassword:
+    post:
+      tags:
+        - Auth
+      operationId: changePassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/authapi/authenticate:
+    post:
+      tags:
+        - Auth
+      operationId: authenticate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/JsonNode'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+components:
+  schemas:
+    JsonNode: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

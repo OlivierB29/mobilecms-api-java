@@ -1,0 +1,54 @@
+openapi: 3.1.0
+info:
+  title: MobileCMS Misc API
+  description: Diagnostics and public utility endpoints.
+  version: v50
+servers:
+  - url: http://localhost:8080
+security:
+  - bearerAuth: []
+tags:
+  - name: Misc
+    description: Diagnostic and root endpoints
+paths:
+  /mobilecmsapi/v50/debugapi:
+    get:
+      tags:
+        - Misc
+      operationId: debug
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: object
+  /mobilecmsapi/v50/agenda/events.ics:
+    get:
+      tags:
+        - Misc
+      operationId: events
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: string
+  /:
+    get:
+      tags:
+        - Misc
+      operationId: root
+      responses:
+        '200':
+          description: OK
+components:
+  schemas: {}
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
