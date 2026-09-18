@@ -1,0 +1,8 @@
+.openapi-generator-ignore
+README.md
+pom.xml
+src/main/java/org/mobilecms/generated/api/ApiUtil.java
+src/main/java/org/mobilecms/generated/api/DefaultApi.java
+src/main/java/org/mobilecms/generated/api/MobilecmsapiApi.java
+src/main/java/org/mobilecms/generated/model/BannerRequest.java
+src/main/java/org/mobilecms/generated/model/UploadRequest.java

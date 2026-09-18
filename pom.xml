@@ -81,6 +81,75 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.9.0</version>
+                <executions>
+                    <execution>
+                        <id>generate-java-interfaces</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi.yaml</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/src/generated</output>
+                            <sourceFolder>src/main/java</sourceFolder>
+                            <apiPackage>org.mobilecms.generated.api</apiPackage>
+                            <modelPackage>org.mobilecms.generated.model</modelPackage>
+                            <invokerPackage>org.mobilecms.generated</invokerPackage>
+                            <configOptions>
+                                <interfaceOnly>true</interfaceOnly>
+                                <useJakartaEe>true</useJakartaEe>
+                                <useSpringBoot3>true</useSpringBoot3>
+                                <skipDefaultInterface>true</skipDefaultInterface>
+                                <serializableModel>true</serializableModel>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>flatten-generated-java</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <delete dir="${project.basedir}/src/generated/java"/>
+                                <move file="${project.basedir}/src/generated/src/main/java" tofile="${project.basedir}/src/generated/java"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <id>add-generated-java-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${project.basedir}/src/generated/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-maven-plugin</artifactId>
                 <version>1.5</version>
@@ -101,3 +170,4 @@
         </plugins>
     </build>
 </project>
+

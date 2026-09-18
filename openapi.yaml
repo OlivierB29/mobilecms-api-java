@@ -4,6 +4,7 @@ info:
   description: "REST API for JSON-file content, authentication, media, and administration."
   license:
     name: MIT
+    identifier: MIT
   version: v50
 servers:
 - url: http://localhost:8080
